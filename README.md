@@ -1,16 +1,19 @@
-### Hi there 👋
+# Hi, I am Sophie!
+----
 
-<!--
-**sophie210286/sophie210286** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+Welcome to my personal Github page! This is where I'll probably post person and/or school projects that I am working on. :sparkling_heart:
 
-Here are some ideas to get you started:
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+I am currently pursuing a Bachelors in Data Science :slightly_smiling_face: :mortar_board: (wish me luck)
+
+:mag_right: Main Interests: Deep learning + Graduating (:crossed_fingers:)
+
+
+:pencil2: Working on: learning C/C++
+
+
+:books: Currently Taking: Design and Algorithms
+
+
+:snake: Main Language(s): Python 
+
