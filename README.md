@@ -1,4 +1,4 @@
-# Hi, I am Sophie!
+# Hi, it's Sophie!
 ----
 
 Welcome to my personal Github page! This is where I'll probably post person and/or school projects that I am working on. :sparkling_heart:
