@@ -6,7 +6,7 @@ Welcome to my personal Github page! This is where I'll probably post person and/
 
 I am currently pursuing a Bachelors in Data Science :slightly_smiling_face: :mortar_board: (wish me luck)
 
-:mag_right: Main Interests: Deep learning + Graduating (:crossed_fingers:)
+:mag_right: Main Interests: Machine learning + Graduating (:crossed_fingers:)
 
 
 :pencil2: Working on: learning C/C++
@@ -17,3 +17,8 @@ I am currently pursuing a Bachelors in Data Science :slightly_smiling_face: :mor
 
 :snake: Main Language(s): Python 
 
+
+
+
+
+--> Will I end the semester or will the semester end me?? Stay tuned. :interrobang: (this is a joke :-:)
