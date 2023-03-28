@@ -1,0 +1,1193 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/sophie210286/sophie210286/blob/main/%2020308-DSCI-4850-AssignmentThree\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# CSC 4850 / 6850 / DSCI 4850 - Assigment 3 - (400/450 points)\n",
+        "\n",
+        "**Total points (400 undergraduate / 450 graduate)**\n",
+        "\n",
+        "**Student Name: Sophia Bell**\n",
+        "\n",
+        "**Undergraduate**\n",
+        "\n",
+        "## Instructions:\n",
+        "\n",
+        "You are to make a copy of this notebook on your own Google Drive (if you don't have one, get one, it is free), and use the exact format provided. Any code needs to go in the code cells, and any 'text' answer/description needs to go in the proper text cell. We will not be looking for answers randomly placed so please read the instructions.\n",
+        "\n",
+        "You are to use only the libraries provided in the next code cell. Any additional library is NOT allowed and will cause you to lose all the points that use said library's functions/functionality. You can use any functions given in the class code examples, but be very very careful of lifting anything \n",
+        "'as-is' from the internet as it will be considerered plagiarism. \n",
+        "\n",
+        "**IMPORTANT: Make sure you use 1234 (for the folds use: 3456, 5678, 7890) for your randomseed/random states. Failure to do so will make your answers not comparable to the answer key and you will get a zero on the whole assignment.**\n",
+        "\n",
+        "## Submission format:\n",
+        "\n",
+        "The submission for Assignment two will have two components:\n",
+        "\n",
+        "1) You are to create a PDF from the PRINT out of this notebook with all cells executed sequentially. It is the student's responsibility to be able to do this and no excuses will be accepted, no legible PDF = zero grade. So practice and test before submission time. This PDF should be named LastName_FirstName-Assignment3.PDF\n",
+        "\n",
+        "2) The student should create a GitHub repository for this assignment and properly title the repository Class_CODE-ClassName-AssignmentTwo. This repository should have a readme file and the Google Colab notebook in it. Note that colab can save a copy directly to GitHub so make sure you test this. Downloading the notebook file and uploading it directly will result in 200 points deduction. The link to your GitHub repository should be included as text/message in the iCollege submission drop, failure to include this link will result in a 100 point penalty. \n",
+        "\n",
+        "## Extra Credit for all:\n",
+        "\n",
+        "Any student can get 20 extra credit points by doing one simple thing:\n",
+        "\n",
+        "1) Make sure your repo for this assignment has a nice README file with figures and results. \n"
+      ],
+      "metadata": {
+        "id": "Uc3L9tKWVV4g"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "**Please read thank you** \n",
+        "\n",
+        "**My code for the Kfold did work(once) but now it takes a really long time to run again...for whatever reason  (I even tried running it in Juypter notebook) I included the code I would use but I dont have the outputs.**"
+      ],
+      "metadata": {
+        "id": "S5kqip9MjZDv"
+      }
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "id": "PjGD5VGFVS-s"
+      },
+      "outputs": [],
+      "source": [
+        "############## These are the only imports allowed to solve this homework, so make sure you do not add anything else down below\n",
+        "\n",
+        "%matplotlib inline\n",
+        "\n",
+        "import numpy as np\n",
+        "import pandas as pd\n",
+        "import sklearn \n",
+        "import numpy as np\n",
+        "import matplotlib.pyplot as plt\n",
+        "import seaborn as sns; sns.set()\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Using the Chess dataset from Kaggle: https://www.kaggle.com/datasets/datasnaek/chess"
+      ],
+      "metadata": {
+        "id": "89_ilQegV-MS"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from google.colab import files\n",
+        "\n",
+        "uploaded = files.upload()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 73
+        },
+        "id": "xRAxViYb795e",
+        "outputId": "a3e2cec1-310c-43a5-af3a-528abfec1d94"
+      },
+      "execution_count": 2,
+      "outputs": [
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "<IPython.core.display.HTML object>"
+            ],
+            "text/html": [
+              "\n",
+              "     <input type=\"file\" id=\"files-edba836d-89a5-4a56-a807-f0c9a64ffbf4\" name=\"files[]\" multiple disabled\n",
+              "        style=\"border:none\" />\n",
+              "     <output id=\"result-edba836d-89a5-4a56-a807-f0c9a64ffbf4\">\n",
+              "      Upload widget is only available when the cell has been executed in the\n",
+              "      current browser session. Please rerun this cell to enable.\n",
+              "      </output>\n",
+              "      <script>// Copyright 2017 Google LLC\n",
+              "//\n",
+              "// Licensed under the Apache License, Version 2.0 (the \"License\");\n",
+              "// you may not use this file except in compliance with the License.\n",
+              "// You may obtain a copy of the License at\n",
+              "//\n",
+              "//      http://www.apache.org/licenses/LICENSE-2.0\n",
+              "//\n",
+              "// Unless required by applicable law or agreed to in writing, software\n",
+              "// distributed under the License is distributed on an \"AS IS\" BASIS,\n",
+              "// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n",
+              "// See the License for the specific language governing permissions and\n",
+              "// limitations under the License.\n",
+              "\n",
+              "/**\n",
+              " * @fileoverview Helpers for google.colab Python module.\n",
+              " */\n",
+              "(function(scope) {\n",
+              "function span(text, styleAttributes = {}) {\n",
+              "  const element = document.createElement('span');\n",
+              "  element.textContent = text;\n",
+              "  for (const key of Object.keys(styleAttributes)) {\n",
+              "    element.style[key] = styleAttributes[key];\n",
+              "  }\n",
+              "  return element;\n",
+              "}\n",
+              "\n",
+              "// Max number of bytes which will be uploaded at a time.\n",
+              "const MAX_PAYLOAD_SIZE = 100 * 1024;\n",
+              "\n",
+              "function _uploadFiles(inputId, outputId) {\n",
+              "  const steps = uploadFilesStep(inputId, outputId);\n",
+              "  const outputElement = document.getElementById(outputId);\n",
+              "  // Cache steps on the outputElement to make it available for the next call\n",
+              "  // to uploadFilesContinue from Python.\n",
+              "  outputElement.steps = steps;\n",
+              "\n",
+              "  return _uploadFilesContinue(outputId);\n",
+              "}\n",
+              "\n",
+              "// This is roughly an async generator (not supported in the browser yet),\n",
+              "// where there are multiple asynchronous steps and the Python side is going\n",
+              "// to poll for completion of each step.\n",
+              "// This uses a Promise to block the python side on completion of each step,\n",
+              "// then passes the result of the previous step as the input to the next step.\n",
+              "function _uploadFilesContinue(outputId) {\n",
+              "  const outputElement = document.getElementById(outputId);\n",
+              "  const steps = outputElement.steps;\n",
+              "\n",
+              "  const next = steps.next(outputElement.lastPromiseValue);\n",
+              "  return Promise.resolve(next.value.promise).then((value) => {\n",
+              "    // Cache the last promise value to make it available to the next\n",
+              "    // step of the generator.\n",
+              "    outputElement.lastPromiseValue = value;\n",
+              "    return next.value.response;\n",
+              "  });\n",
+              "}\n",
+              "\n",
+              "/**\n",
+              " * Generator function which is called between each async step of the upload\n",
+              " * process.\n",
+              " * @param {string} inputId Element ID of the input file picker element.\n",
+              " * @param {string} outputId Element ID of the output display.\n",
+              " * @return {!Iterable<!Object>} Iterable of next steps.\n",
+              " */\n",
+              "function* uploadFilesStep(inputId, outputId) {\n",
+              "  const inputElement = document.getElementById(inputId);\n",
+              "  inputElement.disabled = false;\n",
+              "\n",
+              "  const outputElement = document.getElementById(outputId);\n",
+              "  outputElement.innerHTML = '';\n",
+              "\n",
+              "  const pickedPromise = new Promise((resolve) => {\n",
+              "    inputElement.addEventListener('change', (e) => {\n",
+              "      resolve(e.target.files);\n",
+              "    });\n",
+              "  });\n",
+              "\n",
+              "  const cancel = document.createElement('button');\n",
+              "  inputElement.parentElement.appendChild(cancel);\n",
+              "  cancel.textContent = 'Cancel upload';\n",
+              "  const cancelPromise = new Promise((resolve) => {\n",
+              "    cancel.onclick = () => {\n",
+              "      resolve(null);\n",
+              "    };\n",
+              "  });\n",
+              "\n",
+              "  // Wait for the user to pick the files.\n",
+              "  const files = yield {\n",
+              "    promise: Promise.race([pickedPromise, cancelPromise]),\n",
+              "    response: {\n",
+              "      action: 'starting',\n",
+              "    }\n",
+              "  };\n",
+              "\n",
+              "  cancel.remove();\n",
+              "\n",
+              "  // Disable the input element since further picks are not allowed.\n",
+              "  inputElement.disabled = true;\n",
+              "\n",
+              "  if (!files) {\n",
+              "    return {\n",
+              "      response: {\n",
+              "        action: 'complete',\n",
+              "      }\n",
+              "    };\n",
+              "  }\n",
+              "\n",
+              "  for (const file of files) {\n",
+              "    const li = document.createElement('li');\n",
+              "    li.append(span(file.name, {fontWeight: 'bold'}));\n",
+              "    li.append(span(\n",
+              "        `(${file.type || 'n/a'}) - ${file.size} bytes, ` +\n",
+              "        `last modified: ${\n",
+              "            file.lastModifiedDate ? file.lastModifiedDate.toLocaleDateString() :\n",
+              "                                    'n/a'} - `));\n",
+              "    const percent = span('0% done');\n",
+              "    li.appendChild(percent);\n",
+              "\n",
+              "    outputElement.appendChild(li);\n",
+              "\n",
+              "    const fileDataPromise = new Promise((resolve) => {\n",
+              "      const reader = new FileReader();\n",
+              "      reader.onload = (e) => {\n",
+              "        resolve(e.target.result);\n",
+              "      };\n",
+              "      reader.readAsArrayBuffer(file);\n",
+              "    });\n",
+              "    // Wait for the data to be ready.\n",
+              "    let fileData = yield {\n",
+              "      promise: fileDataPromise,\n",
+              "      response: {\n",
+              "        action: 'continue',\n",
+              "      }\n",
+              "    };\n",
+              "\n",
+              "    // Use a chunked sending to avoid message size limits. See b/62115660.\n",
+              "    let position = 0;\n",
+              "    do {\n",
+              "      const length = Math.min(fileData.byteLength - position, MAX_PAYLOAD_SIZE);\n",
+              "      const chunk = new Uint8Array(fileData, position, length);\n",
+              "      position += length;\n",
+              "\n",
+              "      const base64 = btoa(String.fromCharCode.apply(null, chunk));\n",
+              "      yield {\n",
+              "        response: {\n",
+              "          action: 'append',\n",
+              "          file: file.name,\n",
+              "          data: base64,\n",
+              "        },\n",
+              "      };\n",
+              "\n",
+              "      let percentDone = fileData.byteLength === 0 ?\n",
+              "          100 :\n",
+              "          Math.round((position / fileData.byteLength) * 100);\n",
+              "      percent.textContent = `${percentDone}% done`;\n",
+              "\n",
+              "    } while (position < fileData.byteLength);\n",
+              "  }\n",
+              "\n",
+              "  // All done.\n",
+              "  yield {\n",
+              "    response: {\n",
+              "      action: 'complete',\n",
+              "    }\n",
+              "  };\n",
+              "}\n",
+              "\n",
+              "scope.google = scope.google || {};\n",
+              "scope.google.colab = scope.google.colab || {};\n",
+              "scope.google.colab._files = {\n",
+              "  _uploadFiles,\n",
+              "  _uploadFilesContinue,\n",
+              "};\n",
+              "})(self);\n",
+              "</script> "
+            ]
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Saving games.csv to games (7).csv\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "### Manually download it and upload to this istance data sample space\n",
+        "### Note DO NOT change these operations or all your answers will be incorrect\n",
+        "\n",
+        "### Let's do some transformations and extra features on this.\n",
+        "df=pd.read_csv('games.csv', encoding='utf-8')\n",
+        "\n",
+        "# Difference between white rating and black rating - independent variable\n",
+        "df['rating_difference']=df['white_rating']-df['black_rating']\n",
+        "\n",
+        "# White wins flag (1=win vs. 0=not-win) - dependent (target) variable\n",
+        "df['white_win']=df['winner'].apply(lambda x: 1 if x=='white' else 0)\n"
+      ],
+      "metadata": {
+        "id": "J_sakm7HV90A"
+      },
+      "execution_count": 3,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "For this assignment we will be using two columns as features only, and the white_win colum as the label."
+      ],
+      "metadata": {
+        "id": "zTyRQCajE5Go"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X=df[['rating_difference', 'turns']]\n",
+        "y=df['white_win'].values"
+      ],
+      "metadata": {
+        "id": "mv3OV1HJE4VZ"
+      },
+      "execution_count": 4,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Question 1 (10 points)\n",
+        "\n",
+        "Use sklearn to split this the data into testing and training data. "
+      ],
+      "metadata": {
+        "id": "0TLvYCXVbHN9"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "##### Code block for Question 1\n",
+        "\n",
+        "from sklearn.model_selection import train_test_split\n",
+        "\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y,test_size=0.30, random_state=1234)"
+      ],
+      "metadata": {
+        "id": "ZIxSrPxmbGYZ"
+      },
+      "execution_count": 5,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Question 2 (30 points)\n",
+        "\n",
+        "Manually (DO NOT use kFold or any built-in functionality) create **THREE** different folds for the training data. "
+      ],
+      "metadata": {
+        "id": "Hl5dZFu7lDg5"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "##### Code block for Question 2\n",
+        "\n",
+        "k = 3\n",
+        "random_seed = 3456\n",
+        "\n",
+        "# Get indices of data\n",
+        "n_samples = X.shape[0]\n",
+        "indices = np.arange(n_samples)\n",
+        "\n",
+        "# Set random seed\n",
+        "np.random.seed(random_seed)\n",
+        "\n",
+        "# Shuffle indices\n",
+        "np.random.shuffle(indices)\n",
+        "\n",
+        "# Split indices into k folds\n",
+        "folds = np.array_split(indices, k)\n",
+        "\n",
+        "# Perform k-fold cross-validation\n",
+        "for i in range(k):\n",
+        "    # Get training and testing indices for this fold\n",
+        "    test_indices = folds[i]\n",
+        "    train_indices = np.concatenate([folds[j] for j in range(k) if j != i])\n",
+        "\n",
+        "    # Get training and testing data for this fold\n",
+        "    X_train, y_train = X.iloc[train_indices], y[train_indices]\n",
+        "    X_test, y_test = X.iloc[test_indices], y[test_indices]"
+      ],
+      "metadata": {
+        "id": "H23nsq0mxMWX"
+      },
+      "execution_count": 6,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Question 3 (30 points)\n",
+        "\n",
+        "Create code to build three different SVM models with the following kernels:\n",
+        "\n",
+        "1.   linear\n",
+        "2.   poly\n",
+        "3.   rbf"
+      ],
+      "metadata": {
+        "id": "V6grDh8FlVtS"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "##### Code block for Question 3\n",
+        "from sklearn.svm import SVC\n",
+        "\n",
+        "\n",
+        "# Create an SVM model with a linear kernel\n",
+        "svm_linear = SVC(kernel='linear')\n",
+        "\n",
+        "\n",
+        "# Create an SVM model with a polynomial kernel\n",
+        "svm_polynomial = SVC(kernel='poly', degree=3)\n",
+        "\n",
+        "\n",
+        "# Create an SVM model with an RBF kernel\n",
+        "svm_rbf = SVC(kernel='rbf')"
+      ],
+      "metadata": {
+        "id": "OAmTADedkDN0"
+      },
+      "execution_count": 7,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Question 4 (70 points)\n",
+        "\n",
+        "FOLD 1 - run the first three models with first fold data you created. Output the classification report AND plot its learning curve.\n",
+        "\n",
+        "\n",
+        "In the text cell, following the code block, descibe what findings can be infered from the classification report and learning curve. Mention at least 3 non-trivial observations between the different kernels. "
+      ],
+      "metadata": {
+        "id": "UDBERCfzkTIK"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from sklearn.metrics import classification_report"
+      ],
+      "metadata": {
+        "id": "yBiMBR2A1o8N"
+      },
+      "execution_count": 8,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# linear svm\n",
+        "\n",
+        "k = 3\n",
+        "random_seed = 3456\n",
+        "\n",
+        "# Split data into training and testing sets\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=random_seed)\n",
+        "\n",
+        "# Get indices of training data\n",
+        "n_samples = X_train.shape[0]\n",
+        "indices = np.arange(n_samples)\n",
+        "\n",
+        "# Set random seed\n",
+        "np.random.seed(random_seed)\n",
+        "\n",
+        "# Shuffle indices\n",
+        "np.random.shuffle(indices)\n",
+        "\n",
+        "# Split indices into k folds\n",
+        "folds = np.array_split(indices, k)\n",
+        "\n",
+        "# Get training and testing indices for the first fold\n",
+        "test_indices = folds[0]\n",
+        "train_indices = np.concatenate([folds[j] for j in range(k) if j != 0])\n",
+        "\n",
+        "# Get training and testing data for the first fold\n",
+        "X_train_fold, y_train_fold = X_train.iloc[train_indices], y_train[train_indices]\n",
+        "X_test_fold, y_test_fold = X_train.iloc[test_indices], y_train[test_indices]\n",
+        "\n",
+        "svm_linear.fit(X_train_fold, y_train_fold)  # using the SVM with polynomial kernel\n",
+        "\n",
+        "test_accuracy = svm_linear.score(X_test_fold, y_test_fold)\n",
+        "print(classification_report(y_test_fold, test_accuracy))"
+      ],
+      "metadata": {
+        "id": "t5ZsdWCDJzg6"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# polynomial svm\n",
+        "\n",
+        "k = 3\n",
+        "random_seed = 3456\n",
+        "\n",
+        "# Split data into training and testing sets\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=random_seed)\n",
+        "\n",
+        "# Get indices of training data\n",
+        "n_samples = X_train.shape[0]\n",
+        "indices = np.arange(n_samples)\n",
+        "\n",
+        "# Set random seed\n",
+        "np.random.seed(random_seed)\n",
+        "\n",
+        "# Shuffle indices\n",
+        "np.random.shuffle(indices)\n",
+        "\n",
+        "# Split indices into k folds\n",
+        "folds = np.array_split(indices, k)\n",
+        "\n",
+        "# Get training and testing indices for the first fold\n",
+        "test_indices = folds[0]\n",
+        "train_indices = np.concatenate([folds[j] for j in range(k) if j != 0])\n",
+        "\n",
+        "# Get training and testing data for the first fold\n",
+        "X_train_fold, y_train_fold = X_train.iloc[train_indices], y_train[train_indices]\n",
+        "X_test_fold, y_test_fold = X_train.iloc[test_indices], y_train[test_indices]\n",
+        "\n",
+        "svm_polynomial.fit(X_train_fold, y_train_fold)  # using the SVM with linear kernel\n",
+        "\n",
+        "test_accuracy = svm_polynomial.score(X_test_fold, y_test_fold)\n",
+        "print(classification_report(y_test_fold, test_accuracy))"
+      ],
+      "metadata": {
+        "id": "5zS-VYd8m2AS"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# rbf svm\n",
+        "\n",
+        "k = 3\n",
+        "random_seed = 3456\n",
+        "\n",
+        "# Split data into training and testing sets\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=random_seed)\n",
+        "\n",
+        "# Get indices of training data\n",
+        "n_samples = X_train.shape[0]\n",
+        "indices = np.arange(n_samples)\n",
+        "\n",
+        "# Set random seed\n",
+        "np.random.seed(random_seed)\n",
+        "\n",
+        "# Shuffle indices\n",
+        "np.random.shuffle(indices)\n",
+        "\n",
+        "# Split indices into k folds\n",
+        "folds = np.array_split(indices, k)\n",
+        "\n",
+        "# Get training and testing indices for the first fold\n",
+        "test_indices = folds[0]\n",
+        "train_indices = np.concatenate([folds[j] for j in range(k) if j != 0])\n",
+        "\n",
+        "# Get training and testing data for the first fold\n",
+        "X_train_fold, y_train_fold = X_train.iloc[train_indices], y_train[train_indices]\n",
+        "X_test_fold, y_test_fold = X_train.iloc[test_indices], y_train[test_indices]\n",
+        "\n",
+        "svm_rbf.fit(X_train_fold, y_train_fold)  # using the SVM with rbf kernel\n",
+        "\n",
+        "test_accuracy = svm_rbf.score(X_test_fold, y_test_fold)\n",
+        "print(classification_report(y_test_fold, test_accuracy))"
+      ],
+      "metadata": {
+        "id": "J1CY5X19_Gvp"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Textual answer to question 4 goes here."
+      ],
+      "metadata": {
+        "id": "axlGZ10EkumL"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Question 5 (70 points)\n",
+        "\n",
+        "FOLD 2 - run the first three models with first fold data you created. Output the classification report AND plot its learning curve.\n",
+        "\n",
+        "\n",
+        "In the text cell, following the code block, descibe what findings can be infered from the classification report and learning curve. Mention at least 3 non-trivial observations between the different kernels. "
+      ],
+      "metadata": {
+        "id": "lGTwCVhZHBVn"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "##### Code block for Question 5\n",
+        "\n",
+        "## the question still said to use the 1st fold so I did, I just changed the random seed"
+      ],
+      "metadata": {
+        "id": "K5I5I-vFHBV6"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# linear svm\n",
+        "\n",
+        "k = 3\n",
+        "random_seed =  5678\n",
+        "\n",
+        "# Split data into training and testing sets\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=random_seed)\n",
+        "\n",
+        "# Get indices of training data\n",
+        "n_samples = X_train.shape[0]\n",
+        "indices = np.arange(n_samples)\n",
+        "\n",
+        "# Set random seed\n",
+        "np.random.seed(random_seed)\n",
+        "\n",
+        "# Shuffle indices\n",
+        "np.random.shuffle(indices)\n",
+        "\n",
+        "# Split indices into k folds\n",
+        "folds = np.array_split(indices, k)\n",
+        "\n",
+        "# Get training and testing indices for the first fold\n",
+        "test_indices = folds[0]\n",
+        "train_indices = np.concatenate([folds[j] for j in range(k) if j != 0])\n",
+        "\n",
+        "# Get training and testing data for the first fold\n",
+        "X_train_fold, y_train_fold = X_train.iloc[train_indices], y_train[train_indices]\n",
+        "X_test_fold, y_test_fold = X_train.iloc[test_indices], y_train[test_indices]\n",
+        "\n",
+        "svm_linear.fit(X_train_fold, y_train_fold)  # using the SVM with polynomial kernel\n",
+        "\n",
+        "test_accuracy = svm_linear.score(X_test_fold, y_test_fold)\n",
+        "print(classification_report(y_test_fold, test_accuracy))"
+      ],
+      "metadata": {
+        "id": "naZhh4OF_Qgm"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# polynomial svm\n",
+        "\n",
+        "k = 3\n",
+        "random_seed = 5678\n",
+        "\n",
+        "# Split data into training and testing sets\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=random_seed)\n",
+        "\n",
+        "# Get indices of training data\n",
+        "n_samples = X_train.shape[0]\n",
+        "indices = np.arange(n_samples)\n",
+        "\n",
+        "# Set random seed\n",
+        "np.random.seed(random_seed)\n",
+        "\n",
+        "# Shuffle indices\n",
+        "np.random.shuffle(indices)\n",
+        "\n",
+        "# Split indices into k folds\n",
+        "folds = np.array_split(indices, k)\n",
+        "\n",
+        "# Get training and testing indices for the first fold\n",
+        "test_indices = folds[0]\n",
+        "train_indices = np.concatenate([folds[j] for j in range(k) if j != 0])\n",
+        "\n",
+        "# Get training and testing data for the first fold\n",
+        "X_train_fold, y_train_fold = X_train.iloc[train_indices], y_train[train_indices]\n",
+        "X_test_fold, y_test_fold = X_train.iloc[test_indices], y_train[test_indices]\n",
+        "\n",
+        "svm_polynomial.fit(X_train_fold, y_train_fold)  # using the SVM with linear kernel\n",
+        "\n",
+        "test_accuracy = svm_polynomial.score(X_test_fold, y_test_fold)\n",
+        "print(classification_report(y_test_fold, test_accuracy))"
+      ],
+      "metadata": {
+        "id": "gvG3bwsA_Qgm"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# rbf svm\n",
+        "\n",
+        "k = 3\n",
+        "random_seed = 5678\n",
+        "\n",
+        "# Split data into training and testing sets\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=random_seed)\n",
+        "\n",
+        "# Get indices of training data\n",
+        "n_samples = X_train.shape[0]\n",
+        "indices = np.arange(n_samples)\n",
+        "\n",
+        "# Set random seed\n",
+        "np.random.seed(random_seed)\n",
+        "\n",
+        "# Shuffle indices\n",
+        "np.random.shuffle(indices)\n",
+        "\n",
+        "# Split indices into k folds\n",
+        "folds = np.array_split(indices, k)\n",
+        "\n",
+        "# Get training and testing indices for the first fold\n",
+        "test_indices = folds[0]\n",
+        "train_indices = np.concatenate([folds[j] for j in range(k) if j != 0])\n",
+        "\n",
+        "# Get training and testing data for the first fold\n",
+        "X_train_fold, y_train_fold = X_train.iloc[train_indices], y_train[train_indices]\n",
+        "X_test_fold, y_test_fold = X_train.iloc[test_indices], y_train[test_indices]\n",
+        "\n",
+        "svm_rbf.fit(X_train_fold, y_train_fold)  # using the SVM with rbf kernel\n",
+        "\n",
+        "test_accuracy = svm_rbf.score(X_test_fold, y_test_fold)\n",
+        "print(classification_report(y_test_fold, test_accuracy))"
+      ],
+      "metadata": {
+        "id": "5j90JD-o_Qgn"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Textual answer to question 5 goes here."
+      ],
+      "metadata": {
+        "id": "5AGzL3oNHBV7"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Question 6 (70 points)\n",
+        "\n",
+        "FOLD 3 - run the first three models with first fold data you created. Output the classification report AND plot its learning curve.\n",
+        "\n",
+        "\n",
+        "In the text cell, following the code block, descibe what findings can be infered from the classification report and learning curve. Mention at least 3 non-trivial observations between the different kernels. "
+      ],
+      "metadata": {
+        "id": "bB9uezyvHFc8"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "##### Code block for Question 6\n"
+      ],
+      "metadata": {
+        "id": "952LKGJCHFc9"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# linear svm\n",
+        "\n",
+        "k = 3\n",
+        "random_seed =  7890\n",
+        "\n",
+        "# Split data into training and testing sets\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=random_seed)\n",
+        "\n",
+        "# Get indices of training data\n",
+        "n_samples = X_train.shape[0]\n",
+        "indices = np.arange(n_samples)\n",
+        "\n",
+        "# Set random seed\n",
+        "np.random.seed(random_seed)\n",
+        "\n",
+        "# Shuffle indices\n",
+        "np.random.shuffle(indices)\n",
+        "\n",
+        "# Split indices into k folds\n",
+        "folds = np.array_split(indices, k)\n",
+        "\n",
+        "# Get training and testing indices for the first fold\n",
+        "test_indices = folds[0]\n",
+        "train_indices = np.concatenate([folds[j] for j in range(k) if j != 0])\n",
+        "\n",
+        "# Get training and testing data for the first fold\n",
+        "X_train_fold, y_train_fold = X_train.iloc[train_indices], y_train[train_indices]\n",
+        "X_test_fold, y_test_fold = X_train.iloc[test_indices], y_train[test_indices]\n",
+        "\n",
+        "svm_linear.fit(X_train_fold, y_train_fold)  # using the SVM with polynomial kernel\n",
+        "\n",
+        "test_accuracy = svm_linear.score(X_test_fold, y_test_fold)\n",
+        "print(classification_report(y_test_fold, test_accuracy))"
+      ],
+      "metadata": {
+        "id": "RaYl8VKf_aKu"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# polynomial svm\n",
+        "\n",
+        "k = 3\n",
+        "random_seed =  7890\n",
+        "\n",
+        "# Split data into training and testing sets\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=random_seed)\n",
+        "\n",
+        "# Get indices of training data\n",
+        "n_samples = X_train.shape[0]\n",
+        "indices = np.arange(n_samples)\n",
+        "\n",
+        "# Set random seed\n",
+        "np.random.seed(random_seed)\n",
+        "\n",
+        "# Shuffle indices\n",
+        "np.random.shuffle(indices)\n",
+        "\n",
+        "# Split indices into k folds\n",
+        "folds = np.array_split(indices, k)\n",
+        "\n",
+        "# Get training and testing indices for the first fold\n",
+        "test_indices = folds[0]\n",
+        "train_indices = np.concatenate([folds[j] for j in range(k) if j != 0])\n",
+        "\n",
+        "# Get training and testing data for the first fold\n",
+        "X_train_fold, y_train_fold = X_train.iloc[train_indices], y_train[train_indices]\n",
+        "X_test_fold, y_test_fold = X_train.iloc[test_indices], y_train[test_indices]\n",
+        "\n",
+        "svm_polynomial.fit(X_train_fold, y_train_fold)  # using the SVM with linear kernel\n",
+        "\n",
+        "test_accuracy = svm_polynomial.score(X_test_fold, y_test_fold)\n",
+        "print(classification_report(y_test_fold, test_accuracy))"
+      ],
+      "metadata": {
+        "id": "wlAfvnnh_aKy"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# rbf svm\n",
+        "\n",
+        "k = 3\n",
+        "random_seed = 7890\n",
+        "\n",
+        "# Split data into training and testing sets\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=random_seed)\n",
+        "\n",
+        "# Get indices of training data\n",
+        "n_samples = X_train.shape[0]\n",
+        "indices = np.arange(n_samples)\n",
+        "\n",
+        "# Set random seed\n",
+        "np.random.seed(random_seed)\n",
+        "\n",
+        "# Shuffle indices\n",
+        "np.random.shuffle(indices)\n",
+        "\n",
+        "# Split indices into k folds\n",
+        "folds = np.array_split(indices, k)\n",
+        "\n",
+        "# Get training and testing indices for the first fold\n",
+        "test_indices = folds[0]\n",
+        "train_indices = np.concatenate([folds[j] for j in range(k) if j != 0])\n",
+        "\n",
+        "# Get training and testing data for the first fold\n",
+        "X_train_fold, y_train_fold = X_train.iloc[train_indices], y_train[train_indices]\n",
+        "X_test_fold, y_test_fold = X_train.iloc[test_indices], y_train[test_indices]\n",
+        "\n",
+        "svm_rbf.fit(X_train_fold, y_train_fold)  # using the SVM with rbf kernel\n",
+        "\n",
+        "test_accuracy = svm_rbf.score(X_test_fold, y_test_fold)\n",
+        "print(classification_report(y_test_fold, test_accuracy))"
+      ],
+      "metadata": {
+        "id": "6HgpYzmi_aK0"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Textual answer to question 6 goes here."
+      ],
+      "metadata": {
+        "id": "4hIeICojHFc9"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Question 7 (30 points)\n",
+        "\n",
+        "From the three folds pick the best model for each different type of kernel.\n",
+        "\n",
+        "Present a table with the following columns from their metrics and model. Remember to make classifications on the test set at this stage.\n",
+        "\n",
+        "1. Model Name (Kernel)\n",
+        "2. Accuracy\n",
+        "3. Precision\n",
+        "4. Recall\n",
+        "5. F1-score\n",
+        "6. RMSE\n"
+      ],
+      "metadata": {
+        "id": "D5FbmbFolUE-"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "##### Code block for Question 7"
+      ],
+      "metadata": {
+        "id": "7-wRvWY7mvJ4"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Question 8 (40 points) \n",
+        "\n",
+        "From question 7, which one is the best model in the following contexts:\n",
+        "\n",
+        "a) Metrics from table from question 7, and why?\n",
+        "\n",
+        "b) Based on the learning curves ploted in the previous questions, and why?"
+      ],
+      "metadata": {
+        "id": "d0uKcXIWm2gZ"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Textual answer to question 8a goes here."
+      ],
+      "metadata": {
+        "id": "fUv67lIDnQVt"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Textual answer to question 8b goes here."
+      ],
+      "metadata": {
+        "id": "vekeBSBBnS8d"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Question 9 (50 points)\n",
+        "\n",
+        "Wrie the simplest and most efficient Sklearn pipeline to do extactly what we did in questions 2 to 6. Make sure that you get all the same intermediate outputs and output the same table from quetsion 7 directly from this pipeline."
+      ],
+      "metadata": {
+        "id": "5FAvUA_LptZA"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# rbf svm\n",
+        "\n",
+        "k = 3\n",
+        "random_seed = 5678\n",
+        "\n",
+        "# Split data into training and testing sets\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=random_seed)\n",
+        "\n",
+        "# Get indices of training data\n",
+        "n_samples = X_train.shape[0]\n",
+        "indices = np.arange(n_samples)\n",
+        "\n",
+        "# Set random seed\n",
+        "np.random.seed(random_seed)\n",
+        "\n",
+        "# Shuffle indices\n",
+        "np.random.shuffle(indices)\n",
+        "\n",
+        "# Split indices into k folds\n",
+        "folds = np.array_split(indices, k)\n",
+        "\n",
+        "# Get training and testing indices for the first fold\n",
+        "test_indices = folds[0]\n",
+        "train_indices = np.concatenate([folds[j] for j in range(k) if j != 0])\n",
+        "\n",
+        "# Get training and testing data for the first fold\n",
+        "X_train_fold, y_train_fold = X_train.iloc[train_indices], y_train[train_indices]\n",
+        "X_test_fold, y_test_fold = X_train.iloc[test_indices], y_train[test_indices]\n",
+        "\n",
+        "pipeline = Pipeline([\n",
+        "    ('svm', svm.SVC(kernel='linear'))\n",
+        "])\n",
+        "\n",
+        "pipeline.fit(X_train, y_train)\n",
+        "\n",
+        "\n",
+        "accuracy = pipeline.score(X_test, y_test)\n",
+        "print(accuracy)"
+      ],
+      "metadata": {
+        "id": "Y9_qo7Xf_n5O"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Graduate Student Question: (50 points)\n",
+        "\n",
+        "Use the following function and provide visualizations for the best models for each kernel type from above (looking for three plots to receive full credit). Note: The function might need some small adjustments :)\n"
+      ],
+      "metadata": {
+        "id": "ziqaH6VEuBJK"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def Plot_3D(X, X_test, y_test, clf):\n",
+        "            \n",
+        "    # Specify a size of the mesh to be used\n",
+        "    mesh_size = 5\n",
+        "    margin = 1\n",
+        "\n",
+        "    # Create a mesh grid on which we will run our model\n",
+        "    x_min, x_max = X.iloc[:, 0].fillna(X.mean()).min() - margin, X.iloc[:, 0].fillna(X.mean()).max() + margin\n",
+        "    y_min, y_max = X.iloc[:, 1].fillna(X.mean()).min() - margin, X.iloc[:, 1].fillna(X.mean()).max() + margin\n",
+        "    xrange = np.arange(x_min, x_max, mesh_size)\n",
+        "    yrange = np.arange(y_min, y_max, mesh_size)\n",
+        "    xx, yy = np.meshgrid(xrange, yrange)\n",
+        "            \n",
+        "    # Calculate predictions on grid\n",
+        "    Z = clf.predict_proba(np.c_[xx.ravel(), yy.ravel()])[:, 1]\n",
+        "    Z = Z.reshape(xx.shape)\n",
+        "\n",
+        "    # Create a 3D scatter plot with predictions\n",
+        "    fig = px.scatter_3d(x=X_test['rating_difference'], y=X_test['turns'], z=y_test, \n",
+        "                     opacity=0.8, color_discrete_sequence=['black'])\n",
+        "\n",
+        "    # Set figure title and colors\n",
+        "    fig.update_layout(#title_text=\"Scatter 3D Plot with SVM Prediction Surface\",\n",
+        "                      paper_bgcolor = 'white',\n",
+        "                      scene = dict(xaxis=dict(backgroundcolor='white',\n",
+        "                                              color='black',\n",
+        "                                              gridcolor='#f0f0f0'),\n",
+        "                                   yaxis=dict(backgroundcolor='white',\n",
+        "                                              color='black',\n",
+        "                                              gridcolor='#f0f0f0'\n",
+        "                                              ),\n",
+        "                                   zaxis=dict(backgroundcolor='lightgrey',\n",
+        "                                              color='black', \n",
+        "                                              gridcolor='#f0f0f0', \n",
+        "                                              )))\n",
+        "    # Update marker size\n",
+        "    fig.update_traces(marker=dict(size=1))\n",
+        "\n",
+        "    # Add prediction plane\n",
+        "    fig.add_traces(go.Surface(x=xrange, y=yrange, z=Z, name='SVM Prediction',\n",
+        "                              colorscale='RdBu', showscale=False, \n",
+        "                              contours = {\"z\": {\"show\": True, \"start\": 0.2, \"end\": 0.8, \"size\": 0.05}}))\n",
+        "    fig.show()"
+      ],
+      "metadata": {
+        "id": "iP7WWFw6Esqu"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "##### Code block for Graduate Student Question - Figure 1"
+      ],
+      "metadata": {
+        "id": "a17SE-ZcuALz"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "##### Code block for Graduate Student Question - Figure 2"
+      ],
+      "metadata": {
+        "id": "1qjVDoYuKLCc"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "##### Code block for Graduate Student Question - Figure 3"
+      ],
+      "metadata": {
+        "id": "iXfXoPIpKL_Q"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
